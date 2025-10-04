@@ -1,0 +1,33 @@
+>>> Running: pnpm run -s build (standard webpack build)
+   Γû▓ Next.js 15.5.4
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 15.0s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/5) ...
+   Generating static pages (1/5) 
+   Generating static pages (2/5) 
+   Generating static pages (3/5) 
+ Γ£ô Generating static pages (5/5)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS
+Γöî Γùï /                                     5.46 kB         107 kB
+Γöö Γùï /_not-found                             992 B         103 kB
++ First Load JS shared by all              102 kB
+  Γö£ chunks/2c3511fe-b97f9a252b8cd05c.js   54.2 kB
+  Γö£ chunks/516-f30f8d4345830085.js        45.8 kB
+  Γöö other shared chunks (total)           1.97 kB
+
+Route (pages)                                Size  First Load JS
+ΓöÇ ╞Æ /api/health                               0 B        94.6 kB
++ First Load JS shared by all             94.6 kB
+  Γö£ chunks/framework-d64b5d05acc23894.js  57.4 kB
+  Γö£ chunks/main-9585dea0b4204b1f.js       34.9 kB
+  Γöö other shared chunks (total)           2.25 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

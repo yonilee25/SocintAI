@@ -1,0 +1,5 @@
+>>> Running: pnpm run -s build (standard webpack build)
+   Γû▓ Next.js 15.5.4
+
+ Γ¿» Conflicting app and page file was found, please remove the conflicting files to continue:
+ Γ¿»   "pages/api/health.ts" - "app/api/health/route.ts"

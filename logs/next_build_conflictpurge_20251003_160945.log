@@ -1,0 +1,6 @@
+>>> Running: pnpm run -s build (standard webpack build)
+   Γû▓ Next.js 15.5.4
+
+   Creating an optimized production build ...
+ Γ¿» page.tsx doesn't have a root layout. To fix this error, make sure every page has a root layout.
+Next.js build worker exited with code: 1 and signal: null

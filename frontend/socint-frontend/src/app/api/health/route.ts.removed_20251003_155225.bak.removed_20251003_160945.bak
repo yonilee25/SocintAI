@@ -1,0 +1,11 @@
+export const runtime = 'nodejs';
+import { NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
+
+export async function GET() {
+  const req_id = randomUUID();
+  return NextResponse.json(
+    { ok: true, service: 'socint-frontend', req_id, ts: new Date().toISOString() },
+    { status: 200 }
+  );
+}

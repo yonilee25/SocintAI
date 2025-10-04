@@ -1,0 +1,14 @@
+>>> Running: pnpm run -s build
+ΓÜá No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+   Γû▓ Next.js 15.5.4 (Turbopack)
+
+   Creating an optimized production build ...
+ Γ£ô Finished writing to disk in 57ms
+
+> Build error occurred
+[Error: Turbopack build failed with 1 errors:
+./
+App Router and Pages Router both match path: /api/health
+Next.js does not support having both App Router and Pages Router routes matching the same path. Please remove one of the conflicting routes.
+
+]

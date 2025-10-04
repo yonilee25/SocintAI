@@ -1,0 +1,2 @@
+{"ts":"2025-10-03T10:45:40.6850299-07:00","level":"info","step":"S3.fix_mimemap","req_id":"d0fc8896-bb65-4eab-8027-7f25dab0efd8","op":"start","msg":"Starting S3 hotfix v2 (no WebAdministration; using appcmd)","data":{"machine":"DESKTOP-388OTB4","user":"yoni"}}
+{"ts":"2025-10-03T10:45:40.6976037-07:00","level":"info","step":"S3.fix_mimemap","req_id":"d0fc8896-bb65-4eab-8027-7f25dab0efd8","op":"env.admin","msg":"Already elevated","data":{}}
