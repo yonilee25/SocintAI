@@ -185,4 +185,3 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 - [ ] Begin drafting ERD and migration scripts in `/docs/erd/`.
 - [ ] Prototype SearXNG proxy configuration with failover endpoints.
 - [ ] Evaluate Ollama model combinations on RTX 4060 for throughput.
-
