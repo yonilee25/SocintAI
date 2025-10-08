@@ -13,9 +13,9 @@
 | --- | --- | --- |
 | Presentation | **Next.js 14 + TypeScript**, Tailwind CSS, Headless UI | Responsive UI, target input, dashboards, reporting.
 | Application/API | **Rust** (Axum or Actix Web), Tokio, Serde | REST/GraphQL APIs, orchestration, auth, business logic.
-| Data Processing & AI | Rust services + Python micro-workers (optional) leveraging **Ollama** (Llama 3, Mistral), ONNX Runtime, NVIDIA GPU acceleration | Summarisation, credibility scoring, psychological profiling.
+| Data Processing & AI | Rust services + Python micro-workers (optional) leveraging **Ollama** (Llama 3, Mistral), ONNX Runtime, NVIDIA GPU acceleration | Summarisation, credibility scoring, psychological modeling (8-factor/Big Five mapping), temporal progression analysis.
 | Data Storage | **SQL Server 2022**, Redis 7 (Windows native build), local file/object storage | Core schema, cache, binary artefacts, audit logs.
-| Data Collection | SearXNG proxy, Tavily, Perplexity APIs, ethical web scrapers (Playwright), social media connectors | Aggregated multi-source intelligence gathering with caching & resilience.
+| Data Collection | SearXNG proxy, Wikipedia, Tavily, Perplexity APIs, ethical web scrapers (Playwright), RSS/Atom feeders, public/open APIs, newsroom research APIs, transcript services, social media connectors | Aggregated multi-source intelligence gathering with caching & resilience via compliant data channels, prioritising official feeds and rate-limit-aware collectors.
 | Operations | IIS/ASP.NET Core Module for reverse proxy, Windows Services, PowerShell automation, GitHub Actions (optional) | Deployment, monitoring, blue-green rollout, certificate renewal.
 
 ## Chapter 3. Roadmap by Epics & Phases
@@ -60,10 +60,11 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 ### Feature 2.1 – Visual Profile Dashboard
 - **Stories 2.1.1A/B, 20, 44**: Build 8-factor radar chart with d3.js or Recharts. Provide accessible list view with color-coded confidence scores.
 - Create drill-down modals for factor details, source references, and recommended communication guide entries.
+- Layer in persona timelines and life-event markers aligned to the 8 factors, enabling analysts to correlate behavioural shifts with external triggers.
 - Implement autosave (Story 19) via IndexedDB fallback and Redis session store.
 
 ### Feature 3.1 – Multi-Source Data Validation
-- **Stories 27–29**: Cross-verify data by comparing textual embeddings (e.g., Sentence Transformers on GPU) and scoring sources using credibility algorithm.
+- **Stories 27–29**: Cross-verify data by comparing textual embeddings (e.g., Sentence Transformers on GPU) and scoring sources using credibility algorithm, including psychological consistency checks across time and channels.
 - Maintain `SourceCredibility` table with historical stats; expose UI badges and tooltips.
 
 ### Feature 4.1 – Advanced Authentication Systems
@@ -73,48 +74,57 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 ### Feature 5.1 – Multi-Source Data Collection Engine
 - **Stories 37–40, 46**: Unified ingestion engine using Rust async tasks.
   - Primary search via local SearXNG proxy, fallback to Tavily & Perplexity (Feature 39) with circuit breakers (Feature 43).
-  - Dedicated collectors for each required site list; use RSS when available; Playwright/Chrome headless for dynamic pages within ethical scraping guidelines and robots.txt compliance.
-  - Social media connectors using official APIs where possible (e.g., Reddit JSON, YouTube Data API) and fallback scrapers with rate-limiting.
+  - Dedicated collectors for each required site list; favour official APIs, syndication feeds (RSS/Atom), and structured endpoints (e.g., Bloomberg Enterprise Access Point, Reuters News API) before resorting to Playwright/Chrome headless with robots.txt compliance.
+  - Social media connectors using official APIs where possible (e.g., Reddit JSON, YouTube Data API, LinkedIn public profile export) and fallback scrapers with rate-limiting and consent-aware throttles.
+  - Integrate transcription and caption ingestion for multimedia (YouTube, podcasts) with diarisation-ready text to support language tone analysis.
 
 ### Feature 5.2 – Intelligent Caching & Data Pipeline
-- **Stories 41, 42, 5.2.1**: Introduce Kafka-like queue alternative (e.g., NATS JetStream Windows binary) for pipeline resilience, caching normalized responses, and warming caches on schedule.
+- **Stories 41, 42, 5.2.1**: Introduce Kafka-like queue alternative (e.g., NATS JetStream Windows binary) for pipeline resilience, caching normalized responses, and warming caches on schedule. Pre-compute psychological feature vectors and store them alongside raw documents to accelerate dashboard load times.
 
 ### Feature 5.3 – Resilience and Fallback Systems
 - **Stories 42, 43**: Circuit breaker middleware (Rust `tower` layers), retry policies, degrade gracefully to cached data, alert via Windows notifications or Teams webhook.
 
 ## Chapter 5. Data Architecture & Schemas
-- Provide conceptual ERD detailing relationships; highlight indices for high-volume tables (`SearchCache`, `ResearchData`).
-- Partition large tables by target ID and date; use full-text search indexes on narrative fields.
+- Provide conceptual ERD detailing relationships; highlight indices for high-volume tables (`SearchCache`, `ResearchData`). Extend schema with `PsychSignals`, `PersonaTimeline`, and `MediaTranscripts` tables to capture factor histories, event chronology, and derived linguistic features.
+- Partition large tables by target ID and date; use full-text search indexes on narrative fields, plus vector indexes (via SQL Server semantic search) for rapid similarity across psychological notes.
 - Logging strategy: `SystemLogs` with categories (auth, ingestion, analysis, admin actions).
 - Backup rotation using SQL Server Agent jobs and PowerShell scripts to encrypted storage.
 
-## Chapter 6. AI & Analysis Stack Recommendations
+## Chapter 6. Psychological Intelligence Methodology
+- **Framework Harmonisation**: Combine the mandated 8-factor radar model with complementary Big Five, DISC, and Dark Triad screening modules so analysts can toggle perspectives per mission scope. Maintain translation tables to keep scores comparable across frameworks.
+- **Persona Signal Pipeline**: Normalise ingested content into structured timelines (events, quotes, media appearances) and behavioural categories (leadership, communication, risk appetite). Use entity-resolution against the `Profiles` and `ResearchData` tables to avoid duplicate personas.
+- **Psycholinguistic Tooling**: Enrich summaries with sentiment, emotion, and tone analysis using lexicon-based tools (e.g., NRC, LIWC-style dictionaries) plus transformer classifiers for sarcasm, formality, and persuasion detection. Capture verbal tics from transcripts to feed into communication guides.
+- **Cognitive Bias & Credibility Controls**: Auto-detect conflicting narratives by clustering embeddings and highlight inconsistencies or propaganda markers. Weight scores with the `SourceCredibility` index and expose analyst override workflows for transparent adjustments.
+- **Communication & Influence Playbooks**: Generate guidance artefacts by fusing 8-factor outputs with scenario templates (negotiation, crisis response, investor outreach). Store reusable playbooks in `CommunicationGuides` with traceability back to source evidence.
+- **Continuous Learning Loop**: Provide annotation tooling for analysts to validate or adjust factor scores, feeding a reinforcement dataset that can fine-tune local models and improve future automation while documenting rationale for auditability.
+
+## Chapter 7. AI & Analysis Stack Recommendations
 - Use **Ollama** to host local LLMs: Llama 3 8B (general), Mixtral 8x7B (reasoning), Phi-3-mini (fast summaries).
 - For embeddings and similarity: `sentence-transformers` (all-MiniLM-L12-v2) via ONNX.
 - GPU acceleration via CUDA toolkit; manage VRAM with quantized models (GGUF for Ollama).
-- Summarisation workflow: Source ingestion → Deduplication → Entity extraction (spaCy) → LLM summariser → 8-factor score generator (rule-based + ML model).
-- Optional RAG pipeline with vector store (Qdrant Windows build or Redis Search module).
+- Summarisation workflow: Source ingestion → Deduplication → Entity extraction (spaCy) → LLM summariser → 8-factor score generator (rule-based + ML model) with guardrails for hallucination detection and evidence citation.
+- Optional RAG pipeline with vector store (Qdrant Windows build or Redis Search module). Incorporate specialised classifiers (e.g., MBTI predictors, persuasion intensity detectors) to enrich psychological feature vectors.
 
-## Chapter 7. Security & Compliance Blueprint
+## Chapter 8. Security & Compliance Blueprint
 - Enforce HTTPS via IIS Reverse Proxy + Kestrel (Rust API) behind it; manage certificates with Windows ACME Simple (WACS).
 - Multi-tier auth: password policy, JWT rotation, API keys hashed in DB, WebAuthn for privileged actions.
 - Implement audit logging, rate limiting, IP allow/block lists, request content sanitisation.
 - Plan GDPR-ready data handling: consent tracking, right-to-erasure workflows, pseudonymisation of stored targets.
 
-## Chapter 8. Deployment & Operations
+## Chapter 9. Deployment & Operations
 - Adopt **blue-green deployment** using two IIS sites (e.g., `SocintAI-Blue`, `SocintAI-Green`) pointing to separate service directories.
 - Use PowerShell scripts to:
   - Pull latest Git revision, compile Rust binaries (`cargo build --release`), build Next.js production bundles (`pnpm build`), run migrations, and switch IIS bindings.
   - Monitor Windows Event Logs, integrate with Performance Monitor counters.
 - CI/CD option: GitHub Actions building artifacts, pushing to Windows host via WinRM.
 
-## Chapter 9. Testing Strategy
+## Chapter 10. Testing Strategy
 - Unit tests: Rust `cargo test`, Next.js `vitest`/`jest` for hooks and components.
 - Integration tests: Postman/Newman suites, Playwright E2E for UI flows.
 - Load testing: k6 scripts focusing on search aggregation and dashboard queries.
 - Security testing: OWASP ZAP baseline, dependency scanning (cargo-audit, npm audit).
 
-## Chapter 10. Documentation & Deliverables
+## Chapter 11. Documentation & Deliverables
 - Artefacts to produce each sprint:
   - ER diagrams (draw.io/diagrams.net) exported to `/docs/erd/`.
   - API specification (OpenAPI/AsyncAPI) stored in `/docs/api/`.
@@ -122,14 +132,15 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
   - Runbooks for deployment, incident response, credential rotation.
 - Maintain knowledge base within repo using MkDocs or Docusaurus for publication.
 
-## Chapter 11. Additional Recommendations
+## Chapter 12. Additional Recommendations
 - Consider Windows Subsystem for Linux for developer convenience while keeping prod native.
 - Introduce feature flags (Rust `launchdarkly-server-sdk` or open-source `unleash`) to control rollout.
 - Implement privacy compliance module: configurable redaction, data retention scheduler.
 - Provide analytics instrumentation (PostHog self-hosted) for user behaviour insights.
+- Evaluate optional knowledge graph service (Neo4j Desktop or RDF triplestore) to model relationships between targets, organisations, and events for richer psychological context while keeping SQL Server authoritative for transactions.
 - Establish governance board for scraping ethics, review robots.txt compliance logs.
 
-## Chapter 12. Suggested Timeline & Milestones
+## Chapter 13. Suggested Timeline & Milestones
 1. **Month 0–1**: Environment setup, Next.js skeleton, Rust API bootstrap, SQL Server schema draft.
 2. **Month 2–3**: Authentication MVP (Feature 1.2), input forms (Feature 1.1), caching layer (Feature 1.4A), initial data ingestion (SearXNG primary).
 3. **Month 4–5**: Visual dashboard (Feature 2.1), autosave, validation, initial AI summarisation pipeline.
@@ -137,13 +148,13 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 5. **Month 8–9**: WebAuthn integration, device management, AD planning, expanded social media connectors (Feature 5.1.2B, 46).
 6. **Month 10+**: Enterprise hardening, compliance audits, disaster recovery drills, performance tuning.
 
-## Chapter 13. Success Metrics
+## Chapter 14. Success Metrics
 - Time-to-insight < 2 minutes for standard persona request.
 - Dashboard interaction latency < 200 ms for cached results, < 1 s for fresh computations.
 - ≥ 99.5 % ingestion success rate with automatic failover.
 - Zero critical security findings in quarterly penetration tests.
 
-## Chapter 14. Next Steps Checklist
+## Chapter 15. Next Steps Checklist
 - [ ] Approve architecture & technology selections.
 - [ ] Finalise data governance policy for listed sources (Bloomberg, Reuters, WSJ, etc.).
 - [ ] Confirm identity provider strategy for AD/WebAuthn integration.
