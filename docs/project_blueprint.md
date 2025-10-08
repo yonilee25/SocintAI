@@ -19,12 +19,12 @@
 | Data Storage | **SQL Server 2022**, Redis 7 (Windows native build), local file/object storage | Core schema, cache, binary artefacts, audit logs.
 | Data Collection | SearXNG proxy, Wikipedia, Tavily, Perplexity APIs, ethical web scrapers (Playwright), RSS/Atom feeders, public/open APIs, newsroom research APIs, transcript services, social media connectors | Aggregated multi-source intelligence gathering with caching & resilience via compliant data channels, prioritising official feeds and rate-limit-aware collectors with per-source guardrails.
 | Psychological Knowledge Graph | Neo4j Desktop (optional), SQL Server graph extensions, Rust-based entity resolution | Persist relationships between personas, organisations, events, and psychological vectors to surface cross-target behavioural patterns and inconsistencies. |
-| Operations | IIS/ASP.NET Core Module for reverse proxy, Windows Services, PowerShell automation, GitHub Actions (optional) | Deployment, monitoring, blue-green rollout, certificate renewal.
+| Operations | **Caddy Edge** reverse proxy + IIS/ASP.NET Core Module in hybrid mode, Windows Services, PowerShell automation, GitHub Actions (optional) | Deployment, monitoring, blue-green rollout, certificate renewal with selectable edge gateway.
 
 ## Chapter 3. Roadmap by Epics & Phases
 1. **Epic 1 – Platform Foundation Infrastructure**
    - Feature 1.1, 1.2, 1.3, 1.4 plus supporting stories (1.1.1, 1.1.2, 1.2.1, 1.2.2A/B, 1.3.1, 1.4.1A/B).
-   - Deliverables: Next.js foundation, authentication flows, SQL Server schema, Redis cache, RBAC middleware, caching abstraction, baseline psychological signal taxonomy.
+   - Deliverables: Next.js foundation, authentication flows, SQL Server schema, Redis cache, RBAC middleware, caching abstraction, hybrid edge gateway control (Feature 1.5), baseline psychological signal taxonomy.
 2. **Epic 2 – Core Analysis Platform**
    - Feature 2.1 (2.1.1A/B), Feature 20 (visual dashboard), 44 (8-factor component), 19 (auto-save), 18 (validation).
    - Deliverables: Input flows, live validation, autosave, radar charts, analysis dashboards.
@@ -63,6 +63,12 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 - Provide TTL strategy: hot results 5 min, curated intelligence 24 h, metadata 12 h.
 - Add monitoring hooks (Prometheus exporters for Windows, optionally WMI counters).
 - Implement GPU-aware cache warming to pre-compute embeddings and psychological vectors during off-peak hours, balancing workload with RTX 4060 VRAM constraints.
+
+### Feature 1.5 – Hybrid Edge Gateway Control
+- Provision both IIS and **Caddy Edge** on the Windows host, with Caddy terminating TLS and optionally proxying into IIS or bypassing it entirely.
+- Build an infrastructure control panel inside the admin portal that surfaces gateway health, current routing mode, and a **single-button switch** to toggle between "Caddy → IIS" and "IIS direct" paths with scripted fail-safes.
+- Automate configuration swaps via PowerShell/`caddy.exe` API and IIS AppCmd commands, including certificate sync, site binding updates, and warmup checks before promoting the alternate edge.
+- Log all toggle events to `SystemLogs` with operator identity, pre- and post-state, and roll back automatically if health probes fail.
 
 ### Feature 2.1 – Visual Profile Dashboard
 - **Stories 2.1.1A/B, 20, 44**: Build 8-factor radar chart with d3.js or Recharts. Provide accessible list view with color-coded confidence scores.
@@ -126,14 +132,15 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 - Maintain model registry with evaluation benchmarks (accuracy, hallucination rate, latency) so upgrades tangibly improve psychological insight quality.
 
 ## Chapter 8. Security & Compliance Blueprint
-- Enforce HTTPS via IIS Reverse Proxy + Kestrel (Rust API) behind it; manage certificates with Windows ACME Simple (WACS).
+- Enforce HTTPS via **Caddy Edge** (primary) or IIS reverse proxy in fallback mode feeding Kestrel (Rust API); manage certificates with Windows ACME Simple (WACS) and reuse across both gateways.
 - Multi-tier auth: password policy, JWT rotation, API keys hashed in DB, WebAuthn for privileged actions.
 - Implement audit logging, rate limiting, IP allow/block lists, request content sanitisation.
 - Plan GDPR-ready data handling: consent tracking, right-to-erasure workflows, pseudonymisation of stored targets.
 - Add continuous compliance scanner that validates each ingestion connector remains within approved regions, data sharing agreements, and workload thresholds.
 
 ## Chapter 9. Deployment & Operations
-- Adopt **blue-green deployment** using two IIS sites (e.g., `SocintAI-Blue`, `SocintAI-Green`) pointing to separate service directories.
+- Adopt **blue-green deployment** using two IIS sites (e.g., `SocintAI-Blue`, `SocintAI-Green`) pointing to separate service directories and front them with **Caddy Edge** as the default TLS terminator.
+- Provide a hybrid edge automation script set so the platform can pivot between "Caddy-fronted" and "IIS-fronted" modes; the script must expose a command that the admin portal’s single-button switch (Feature 1.5) can call safely.
 - Use PowerShell scripts to:
   - Pull latest Git revision, compile Rust binaries (`cargo build --release`), build Next.js production bundles (`pnpm build`), run migrations, and switch IIS bindings.
   - Monitor Windows Event Logs, integrate with Performance Monitor counters.
@@ -165,8 +172,8 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 - Establish governance board for scraping ethics, review robots.txt compliance logs.
 
 ## Chapter 13. Suggested Timeline & Milestones
-1. **Month 0–1**: Environment setup, Next.js skeleton, Rust API bootstrap, SQL Server schema draft.
-2. **Month 2–3**: Authentication MVP (Feature 1.2), input forms (Feature 1.1), caching layer (Feature 1.4A), initial data ingestion (SearXNG primary).
+1. **Month 0–1**: Environment setup, Next.js skeleton, Rust API bootstrap, SQL Server schema draft, install IIS + Caddy Edge baseline with shared certificate automation.
+2. **Month 2–3**: Authentication MVP (Feature 1.2), input forms (Feature 1.1), caching layer (Feature 1.4A), initial data ingestion (SearXNG primary), prototype Feature 1.5 toggle workflow.
 3. **Month 4–5**: Visual dashboard (Feature 2.1), autosave, validation, initial AI summarisation pipeline.
 4. **Month 6–7**: Advanced data validation (Feature 3.1), multi-source collectors, circuit breakers, Redis multi-layer cache (Feature 45).
 5. **Month 8–9**: WebAuthn integration, device management, AD planning, expanded social media connectors (Feature 5.1.2B, 46).
@@ -184,4 +191,6 @@ Each epic decomposes into sprints combining backend, frontend, and ops tasks. Mi
 - [ ] Confirm identity provider strategy for AD/WebAuthn integration.
 - [ ] Begin drafting ERD and migration scripts in `/docs/erd/`.
 - [ ] Prototype SearXNG proxy configuration with failover endpoints.
+- [ ] Implement Caddy Edge + IIS hybrid automation scripts and wire admin single-button toggle (Feature 1.5).
 - [ ] Evaluate Ollama model combinations on RTX 4060 for throughput.
+
